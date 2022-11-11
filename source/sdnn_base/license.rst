@@ -1,30 +1,30 @@
-===========
-License配置
-===========
+=====================
+Lincense configration
+=====================
 
-申请license
-===========
+Apply for license
+=================
 
-由于SlimAI工具链需要安装license，否则无法进行编译。相关license获取及使用方法可以联系我司FAE人员，并提供如下信息：
+Before starting your work, you need to install license. please contact our FAE to get the license in detials. please provide the following information:
 
-- **软件环境**：Linux Ubuntu 版本
-- **用户名**：中英文都可
-- **MAC地址**：获取Server(主机) MAC 地址
-- **HostName**：获取系统的主机名
+- **software envirment**：Linux Ubuntu version
+- **user name**：both Chines and English
+- **MAC address**：Server(host) MAC adrress
+- **HostName**：host name
 
 .. note::
 
-   #. MAC地址对应实际运行主机的地址，并非Docker容器内获取的地址。
-   #. HostName可以通过 ``cat /etc/hostname`` 命令获得。
-   #. 主机环境建议使用 **ubuntu** 系统
+   #. MAC address is the local host adrress, not Docker container address.
+   #. HostName:  use  ``cat /etc/hostname`` to get host name.
+   #. strongly recommand useing  **ubuntu** system.
 
-安装license
-===========
+Install license
+===============
 
-阅读文档
---------
+documentation
+-------------
 
-拿到License文件，请参考文件包中 **install instruction linux.pdf** 文档把环境搭建好，文件包目录结构如下：
+after geting your License file，plese refer to **install instruction linux.pdf**, the directory structure is follwing:
 
 .. code-block:: bash
    :linenos:
@@ -42,32 +42,31 @@ License配置
    ├── xtensa.lic
    └── xtensa.log
 
-执行安装
---------
+execute installation
+--------------------
 
-启用普通用户权限，执行如下命令:
+execute command:
 
 .. code-block:: bash
 
    $ ./start_license.sh
 
+after this execution，will generate  **xtensa.log** file.
 
-执行安装脚本后，将会生成 **xtensa.log** 文件。
+check license
+=============
 
-检查license
-===========
-
-执行 ``check_license.sh`` 脚本，获取 **license** 安装状态。
+execute ``check_license.sh`` script to get the status  of  **license** .
 
 .. code-block:: shell
    :linenos:
 
    $ ./check_license.sh
 
-安装成功
---------
+sucessful installation
+----------------------
 
-执行检查脚本后，如果输出如下类似信息则表示安装成功：
+the following output indicates sucessful installation of license:
 
 .. code-block:: bash
 
@@ -77,10 +76,10 @@ License配置
    Xt_XCC_FUSA_E2B6056E   14.0          1        xtensad  21-jul-2022
    Xt_XPLORER_SE          14.0          1        xtensad  21-jul-2022
 
-安装失败
---------
+failed installation
+-------------------
 
-如果返回如下信息，则说明license安装失败，请查看 ``xtensa.log`` 文件，里面有详细的错误提示。
+If the following information is returned, it means that the license installation failed. Please check the ``xtensa.log`` file, which contains detailed error messages.
 
 .. code-block:: bash
 
@@ -89,23 +88,23 @@ License配置
 
 .. note::
 
-   1. 确认PC状态是否发生变化，如 **MAC地址** 和 **HOST Name** 是否与申请license时一致；
-   2. 确认本机端口号是否被其它应用占用；
+   1. reconfirm  **MAC address** and **HOST Name** if it is consistent;
+   2. confirm if the host port is occupied;
 
-端口占用问题
-^^^^^^^^^^^^
+port occupancy problem
+^^^^^^^^^^^^^^^^^^^^^^
 
-如果 ``xtensa.log`` 文件显示如下信息，则说明license服务的端口已经被占用，无法打开。
+If the ``xtensa.log`` file displays the following information, it means that the port of the license service has been occupied and cannot be opened.
 
 .. code-block:: bash
 
    Failed to open the TCP port number in the license
 
-此时可以通过如下指令查询占用端口的进程：
+At this time, you can query the process occupying the port by using the following command:
 
 .. code-block:: bash
 
    $ netstat -natp | grep [port]
 
 
-``kill`` 相关进程 **ID** ,重新执行 ``start_license.sh`` 脚本。
+``kill`` relate process  **ID** , re-execute ``start_license.sh`` script.

@@ -11,8 +11,8 @@ The ``sdnn_build`` tool implements model compilation and converts the model file
 .. image:: ../_static/images/devp/sdnn_build_framework.png
 
 
-Use steps
-=========
+Usage
+=====
 
 Get tool
 --------
