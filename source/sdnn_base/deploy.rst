@@ -2,7 +2,7 @@
 Deploy environment configuration
 ====================================
 
-Get required runtime lib files form `Semidrive Customer support<https://www.semidrive.com/>`_ , or click and download them from links listed below:
+Get required runtime lib files form `Semidrive Customer support <https://www.semidrive.com/>`_ , or click and download them from links listed below:
 
 .. tabs::
 
@@ -23,10 +23,10 @@ Get required runtime lib files form `Semidrive Customer support<https://www.semi
       1. `qnx_runtime installation package <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/aarch64-qnx.tgz>`_
 
 
-   .. important::
+.. important::
 
-      #. The runtime lib version must align with sdnn_build version, or it may cause uncertainties.
-      #. Please update the runtime lib in the deploy environment after each upgrade of the sdnn build tool in compile environment.
+   #. The runtime lib version must align with sdnn_build version, or it may cause uncertainties.
+   #. Please update the runtime lib in the deploy environment after each upgrade of the sdnn build tool in compile environment.
 
 
 Deploy on Linux board

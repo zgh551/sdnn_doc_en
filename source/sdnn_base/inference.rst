@@ -50,7 +50,7 @@ Examples are released for telling how to use ``API`` to deploy compiled model to
 Get source code
 -----------------
 
-Get the examples codebase URL from `Semidrive Customer support<https://www.semidrive.com/>`_
+Get the examples codebase URL from `Semidrive Customer support <https://www.semidrive.com/>`_
 
 compile APP
 ------------
