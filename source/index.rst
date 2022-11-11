@@ -3,21 +3,22 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-SDNN 用户指南
-=============
-SDNN 是一个基于开源编译器框架TVM的端到端的AI编译器框架，SEMIDRIVE 对TVM编译器框架做了适配，主要特性如下：
+SDNN User Guide
+===============
 
-- 基于TVM 0.8.0 Release
-- 支持OS: Android\Linux\QNX 开发及部署
-- 支持多后端：X86_64_CPU/AARCH64_CPU/GPU(OPENCL)/SlimAI
-- 支持C++/PYTHON接口开发及部署方式
-- 支持异构及同构多模型部署
-- 支持多进程和多线程应用
+SDNN is an end-to-end AI compiler framework based on the open source compiler framework TVM. SEMIDRIVE has adapted the TVM compiler framework. The main features are as follows:
+
+- Base on TVM 0.8.0 Release
+- Support OS: ``Android`` , ``Linux`` , ``QNX`` development and deployment
+- Support for multiple backends: ``CPU`` , ``GPU`` , ``SlimAI``
+- Support C++/PYTHON interface development and deployment
+- Support heterogeneous and homogeneous multi-model deployment
+- Support for multi-process and multi-threaded applications
 
 .. toctree::
    :maxdepth: 2
    :numbered:
-   :caption: SDNN基础
+   :caption: SDNN Base
    :name: sdnn_base
 
    sdnn_base/license
@@ -28,6 +29,6 @@ SDNN 是一个基于开源编译器框架TVM的端到端的AI编译器框架，S
 
 .. toctree::
    :maxdepth: 2
-   :caption: 附录
+   :caption: appendix
 
    appendix/operator_support

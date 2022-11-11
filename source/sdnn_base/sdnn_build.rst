@@ -1,35 +1,36 @@
-========
-SDNN编译
+==========
+SDNN Build
+==========
+
+Overview
 ========
 
-概述
-====
+The ``sdnn_build`` tool implements model compilation and converts the model files of different frameworks into the unified file format of SDNN framework. The model file can be sent to the NPU simulator for model performance and accuracy evaluation, or copied to the target device. By calling the corresponding runtime Libraries to implement deployment for different OS.
 
-``sdnn_build`` 工具实现模型编译，将不同框架的模型文件转换成SDNN框架统一的文件格式，该模型文件可以送到NPU仿真器进行模型的性能和精度评估，也可以拷贝到目标设备端，通过调用相应的runtime库，实现不同OS的部署。
 
 .. image:: ../_static/images/devp/sdnn_build_framework.png
 
 
-使用步骤
-========
+Use steps
+=========
 
-获取工具
+Get tool
 --------
 
-可以通过 `客户支持系统 <https://www.semidrive.com/>`_ 获取SDNN编译工具包,或者点击下表版本链接获取工具：
+By `Customer Support System <https://www.semidrive.com/>`_ get the SDNN compilation toolkit, or click the version link below to get the tool：
 
-+---------------+------------------------------+
-| 版本          | 说明                         |
-+===============+==============================+
-| `sdnn_build`_ | 该版本主要优化了模型文件体积 |
-+---------------+------------------------------+
++---------------+---------------------------------------------------+
+| version       | describe                                          |
++===============+===================================================+
+| `sdnn_build`_ | This version mainly optimizes the model file size |
++---------------+---------------------------------------------------+
 
 .. _sdnn_build: https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/sdnn_cl-2.2.3-cp36-cp36m-linux_x86_64.whl
 
-安装工具
---------
+Installation tool
+-----------------
 
-然后执行下述安装操作：
+Then perform the following installation operations：
 
 .. code-block:: shell
    :linenos:
@@ -37,16 +38,16 @@ SDNN编译
    $ pip install sdnn_cl-2.2.3-cp36-cp36m-linux_x86_64.whl
 
 .. note::
-   #. 该工具需安装在 **章节2** 描述的docker环境中，其它环境可能会因为缺乏编译工具链而无法使用；
-   #. 如果docker容器中存在版本一致sdnn-cl工具包，需要先卸载再安装；
-   #. 如果docker容器中已经部署过TVM源码，则需要创建一个新的容器环境，不然会存在冲突；
 
-模型编译
---------
+   #. The tool needs to be installed in the docker environment described in **Chapter 2**, other environments may not be available due to lack of compilation toolchain;
+   #. If the sdnn-cl toolkit with the same version exists in the docker container, it needs to be uninstalled and then installed;
 
-模型编译目前支持两种模式，模型文件模式和json文件模式。
+Model compilation
+-----------------
 
-**模型文件模式**
+Model compilation currently supports two modes, ``model file`` mode and ``json file`` mode.
+
+**Model File Mode**
 
 .. code-block:: shell
    :linenos:
@@ -54,88 +55,83 @@ SDNN编译
    $ sdnn_build -f mobilenet_v2.onnx -a slimai
 
 
-**json文件模式**
+**Json File Mode**
 
 .. code-block:: shell
    :linenos:
 
    $ sdnn_build -f mobilenet_v2.json -a slimai
 
-参数说明
-========
+Parameter Description
+=====================
 
-概述
-----
-
-编译时所用到的参数，大致可以分为一下几大类：
-
-#. :ref:`base_params`：包含编译模型所需的基本编译选项，一般模型编译只需要关注该章节参数即可；
-#. :ref:`advanced_params`：包含一些特殊情况下才需使用的参数选项；
-#. :ref:`quant_params`：包含模型量化需要使用的参数；
-#. :ref:`debug_params`：包含编译调试和模型仿真分析等相关参数；
-#. :ref:`preprocess_params`：包含模型预处理相关参数，如果使用sdnn_test程序评估模型，需要关注该参数；
-#. :ref:`postprocess_params`：包含模型后处理相关参数，如果使用sdnn_test程序评估模型，需要关注该参数；
-
-基础参数
+Overview
 --------
 
-.. table:: 基础参数
+The parameters used during compilation can be roughly divided into the following categories:
+
+#. :ref:`base_params`：Contains the basic compilation options required to compile the model. Generally, model compilation only needs to pay attention to the parameters of this chapter;
+#. :ref:`advanced_params`：Contains some parameter options that need to be used in special cases;
+#. :ref:`quant_params`：Contains the parameters that need to be used for model quantization;
+#. :ref:`debug_params`：Contains relevant parameters such as compilation and debugging and model simulation analysis;
+#. :ref:`preprocess_params`：Contains parameters related to model preprocessing. If you use the sdnn_test program to evaluate the model, you need to pay attention to this parameter;
+#. :ref:`postprocess_params`：Contains parameters related to model post-processing. If you use the sdnn_test program to evaluate the model, you need to pay attention to this parameter;
+
+Basic parameters
+----------------
+
+.. table:: Basic parameters
    :name: base_params
 
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | 命令参数      | 缩略参数 | 默认值  | 可选范围                                | 说明               |
-   +===============+==========+=========+=========================================+====================+
-   | --help        | -h       |         |                                         | sdnn工具参数说明   |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --version     | -v       |         |                                         | 查看SDNN版本       |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --file        | -f       |         |                                         | 模型文件或json文件 |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --cfg         | -c       |         |                                         | 指定配置文件路径   |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --host        |          | aarch64 | x86_64, aarch64                         | 主机平台           |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --os          |          | linux   | linux, android, qnx                     | 操作系统           |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --accelerator | -a       | cpu     | cpu, gpu, slimai                        | 推理加速器         |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --save        | -s       | models  |                                         | 模型库保存路径     |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --name        | -n       | default |                                         | 模型别名           |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --type        | -t       | onnx    | onnx, caffe, tf, tflite                 | 模型文件类型       |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
-   | --domain      |          |         | Classification, Segmentation, Detection | 模型领域           |
-   +---------------+----------+---------+-----------------------------------------+--------------------+
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | command       | abbreviated | default | range                                   | illustrate                          |
+   +===============+=============+=========+=========================================+=====================================+
+   | --help        | -h          |         |                                         | sdnn tool parameter description     |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --version     | -v          |         |                                         | View SDNN version                   |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --file        | -f          |         |                                         | model file or json file             |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --cfg         | -c          |         |                                         | Specify the configuration file path |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --host        |             | aarch64 | x86_64, aarch64                         | host platform                       |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --os          |             | linux   | linux, android, qnx                     | operating system                    |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --accelerator | -a          | cpu     | cpu, gpu, slimai                        | Inference accelerator               |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --save        | -s          | models  |                                         | Model library save path             |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --name        | -n          | default |                                         | model alias                         |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --type        | -t          | onnx    | onnx, caffe, tf, tflite                 | Model file type                     |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
+   | --domain      |             |         | Classification, Segmentation, Detection | model domain                        |
+   +---------------+-------------+---------+-----------------------------------------+-------------------------------------+
 
-文件参数
-^^^^^^^^
+file parameters
+^^^^^^^^^^^^^^^
 
-模型相关的文件都通过 ``-f`` 或 ``--file`` 参数指定，如果模型包含多个文件(caffe)，或者需要同时编译多个模型，可以通过指定多个 ``-f`` 或 ``--file`` 参数实现。
-
-.. note::
-
-   #. 如果指定的是模型文件，按需指定模型的相关参数，编译时会自动生成该模型对应的json配置文件，并将命令行中指定的参数保存到配置文件中，方便后续编译使用json配置文件;
-   #. 如果指定的是json配置文件，该配置文件中包含了模型相关的参数信息，如果模型参数信息需要修改，可以打开文件修改，或者在编译时添加需要更改的参数来修正模型参数。
+Model-related files are specified by ``-f`` 或 ``--file`` arguments,If the model contains multiple files(caffe) Or need to compile multiple models at the same time,This can be done by specifying multiple ``-f`` or ``--file`` arguments.
 
 .. tabs::
 
-   .. tab:: 模型文件
+   .. tab:: model file
 
-      **单模型编译**
+      **single model compilation**
 
-      1. *单文件模型*
+      1. *single file model*
 
-      例如onnx模型：
+      For example, the onnx model：
 
       .. code-block:: bash
 
          $ sdnn_build -f ./mobilenet_v2.onnx
 
 
-      2. *多文件模型*
+      2. *multiple file model*
 
-      例如caffe模型，包含两个文件：
+      For example, the caffe model, which contains two files:
 
       .. code-block:: bash
 
@@ -144,27 +140,30 @@ SDNN编译
 
       .. note::
 
-         - 文件先后无限制
+         - Unlimited file order
 
 
-      **多模型编译**
+      **multi-model compilation**
 
-      通过 ``--file`` 或 ``-f`` 参数指定多个模型的路径。
+      Specify paths to multiple models via the ``--file`` or ``-f`` arguments.
 
       .. code-block:: bash
 
          $ sdnn_build -f ./mobilenet_v2.onnx -f ./mobilenet_v1.caffemodel -f ./mobilenet_v1.prototxt
 
+      .. note::
 
-   .. tab:: JSON文件
+         #. If you specify a model file, specify the relevant parameters of the model as needed, the json configuration file corresponding to the model will be automatically generated during compilation, and the parameters specified in the command line will be saved to the configuration file, which is convenient for subsequent compilation and use of the json configuration file;
 
-      **单模型编译**
+   .. tab:: JSON file
+
+      **single model compilation**
 
       .. code-block:: bash
 
          sdnn_build -f model1.json
 
-      **多模型编译**
+      **multi-model compilation**
 
       .. code-block:: bash
 
@@ -172,7 +171,7 @@ SDNN编译
 
       .. hint::
 
-         json配置文件的完整格式如下：
+         The full format of the json configuration file is as follows：
 
          .. code-block:: json
             :linenos:
@@ -214,112 +213,116 @@ SDNN编译
              "cfg": "./xxx.cfg"
             }
 
+      .. note::
+
+         #. If you specify a json configuration file, the configuration file contains model-related parameter information. If the model parameter information needs to be modified, you can open the file for modification, or add the parameters that need to be changed at compile time to correct the model parameters.
 
 .. attention::
 
-   #. 第一次执行模型文件编译后，会自动生成与该模型对应的 **cfg.json** 配置文件，当然也可以手动创建，按照上述完整格式填充必要信息；
-   #. json配置文件中的一些参数，如果在编译时没有指定，会填充默认参数，使用自动生成的 **cfg.json** 文件前，请确认文件内容是否与模型匹配；
-   #. 如果json文件中指定 **cfg字段** ，则会忽略 **quant** 和 **model** 字段中的参数，优先采用指定的配置文件进行NPU量化；
-   #. 如果json文件中 ``无`` **cfg字段** ，则会根据 **quant** 和 **model** 字段中的参数,自动生成对应NPU的配置文件，文件后缀 **.autogen.cfg** ，文件路径与模型文件同目录。
+   #. After the model file is compiled for the first time, the **xxx.cfg.json** configuration file corresponding to the model will be automatically generated. Of course, it can also be created manually, and the necessary information is filled in according to the above complete format;
+   #. If some parameters in the json configuration file are not specified at compile time, the default parameters will be filled. Before using the automatically generated **xxx.cfg.json** file, please confirm whether the content of the file matches the model;
+   #. If the **cfg** field is specified in the json file, the parameters in the **quant** and **model** fields will be ignored, and the specified **cfg** field file will be used for NPU quantization;
+   #. If ``no`` **cfg** field in the json file, the configuration file corresponding to the NPU will be automatically generated according to the parameters in the **quant** and **model** fields, with the file suffix **xxx.autogen.cfg** , the file path is the same directory as the model file.
 
-CFG配置文件
+cfg configuration file
+^^^^^^^^^^^^^^^^^^^^^^
+
+Specify the path of the NPU quantization configuration file through the parameter ``--cfg`` or ``-c``. Currently, the NPU device refers to SlimAI.
+
+host platform
+^^^^^^^^^^^^^
+
+The target host platform for model compilation is configured with the parameter ``--host``, which defaults to **aarch64** .
+
+.. note::
+
+   #. **x86_64**：Refers to all devices that use x86_64 architecture CPU as the host, such as most PCs and servers, model files in this format can facilitate application debugging;
+   #. **aarch64**：Refers to all CPUs of ARMV8 architecture, and 9 series chips belong to this framework;
+
+
+
+operating system
+^^^^^^^^^^^^^^^^
+
+Configure the operating system corresponding to the deployed model file (.so) through the parameter ``--os``, and its default value is **linux** .
+
+.. note::
+
+   #. Currently 9 series chips support deployment systems including: linux, android and qnx;
+   #. If the host selects x86_64, currently only linux systems are supported;
+
+acceleration device
+^^^^^^^^^^^^^^^^^^^
+
+Configure the target inference device of model compilation via the parameter ``--accelerator`` or ``-a``, which defaults to **cpu** .
+
+.. note::
+
+   #. The acceleration devices currently supported by the 9 series chips include: **CPU**, **GPU** and **SlimAI**.
+   #. If the host selects x86_64, currently only CPU devices are supported for model inference.
+
+model save path
+^^^^^^^^^^^^^^^
+
+Configure the path to generate model files via the parameter ``--save`` or ``-s``, the default value is **models** . 
+Under this path, a folder combined with the host platform and operating system will be generated, and the folder will contain a **xxx.so** library file and a **xxx.deploy.json** file.
+
+
+model alias
 ^^^^^^^^^^^
 
-通过参数 ``--cfg`` 或 ``-c`` 指定NPU量化配置文件路径，目前NPU设备指SlimAI。
-
-主机平台
-^^^^^^^^
-
-通过参数 ``--host`` 配置模型编译的目标主机平台，其默认值为 **aarch64** 。
+Configured by the parameter ``--name`` or ``-n``, if not specified, the name of the model file will be used as the alias of the output model library.
 
 .. note::
 
-   #. **x86_64**：指所有以x86_64架构CPU作为主机的设备，例如大多数PC和服务器，该格式的模型文件可以方便进行应用程序的调试；
-   #. **aarch64**：指所有ARMV8架构的CPU，9系列芯片都属于该框架；
+   #. Do not include characters such as ``-`` in aliases;
+   #. If the model file name contains ``-`` characters, and no model alias is specified, the ``-`` characters in the model name will be automatically converted to ``_`` characters.
 
+model file type
+^^^^^^^^^^^^^^^
 
-
-操作系统
-^^^^^^^^
-
-通过参数 ``--os`` 配置模型文件(.so)对应部署的操作系统，其默认值为 **linux** 。
+Configured by the parameter ``--type`` or ``-t``, if not specified, the model type will be identified by the suffix of the model file.
 
 .. note::
 
-   #. 目前9系列芯片支持部署系统包括: linux、android和qnx；
-   #. 如果主机选择x86_64，目前只支持linux系统；
+   Currently supported models are: ``onnx`` , ``caffe`` , ``tf`` , ``tflite``
 
-加速设备
-^^^^^^^^
-
-通过参数 ``--accelerator`` 或 ``-a`` 配置模型编译目标部署的推理设备，其默认值为 **cpu** 。
-
-.. note::
-
-   #. 目前9系列芯片支持的加速设备包括：CPU、GPU和SlimAI。
-   #. 如果主机选择x86_64，目前只支持CPU设备进行模型推理。
-
-模型保存路径
+model domain
 ^^^^^^^^^^^^
 
-通过参数 ``--save`` 或 ``-s`` 配置模型文件的生成路径，其默认值为 **models** 。该路径下会生成以主机平台和操作系统组合的文件夹，在该文件夹内包含一个so库文件和一个.deploy.json文件。
+Configured by the parameter ``--domain``, currently supports **classification** , **detection** and **segmentation** three domain models.
 
+Advanced parameters
+-------------------
 
-模型别名
-^^^^^^^^
-
-通过参数 ``--name`` 或 ``-n`` 配置，如果不指定，会使用模型文件的名字作为输出模型库的别名。
-
-.. note::
-
-   #. 别名中不要包含 ``-`` 等字符；
-   #. 如果模型文件名中包含 ``-`` 字符，且没有指定模型别名，则会自动将模型名中的 ``-`` 字符转成 ``_`` 字符。
-
-模型文件类型
-^^^^^^^^^^^^
-
-通过参数 ``--type`` 或 ``-t`` 配置，如果不指定，会通过模型文件的后缀识别模型类型。
-
-.. note::
-
-   目前支持的模型有：``onnx`` 、``caffe`` 、``tf`` 、``tflite``
-
-模型所属领域
-^^^^^^^^^^^^
-
-通过参数 ``--domain`` 配置，目前支持 **分类** 、 **检测** 和 **分割** 三种领域的模型;
-
-进阶参数
---------
-
-.. table:: 进阶参数
+.. table:: Advanced parameters
    :name: advanced_params
 
-   +-----------------+----------+----------+-----------------+---------------------+
-   | 命令参数        | 缩略参数 | 默认值   | 可选范围        | 说明                |
-   +=================+==========+==========+=================+=====================+
-   | --opt_level     | -l       | 3        | 1,2,3,4         | IR优化等级          |
-   +-----------------+----------+----------+-----------------+---------------------+
-   | --elf_mode      | -m       | separate | merge, separate | 选择模型合并模式    |
-   +-----------------+----------+----------+-----------------+---------------------+
-   | --elf_build_off | -b       | False    |                 | 使能关闭编译elf文件 |
-   +-----------------+----------+----------+-----------------+---------------------+
+   +-----------------+--------------+----------+-----------------+---------------------------------------+
+   | command         | abbreviation | default  | range           | illustrate                            |
+   +=================+==============+==========+=================+=======================================+
+   | --opt_level     | -l           | 3        | 1,2,3,4         | IR optimization level                 |
+   +-----------------+--------------+----------+-----------------+---------------------------------------+
+   | --elf_mode      | -m           | separate | merge, separate | Select model merge mode               |
+   +-----------------+--------------+----------+-----------------+---------------------------------------+
+   | --elf_build_off | -b           | False    |                 | Enable to close the compiled elf file |
+   +-----------------+--------------+----------+-----------------+---------------------------------------+
 
-IR优化等级
-^^^^^^^^^^^
+ir optimization level
+^^^^^^^^^^^^^^^^^^^^^
 
-通过参数 ``--opt_level`` 或 ``-l`` 配置，其默认值为 **3** 。
+Configured via the parameter ``--opt_level`` or ``-l``, its default value is **3** .
 
 .. note::
 
-   如果出现优化后的算子不支持，可以适当调低；
+   If the optimized operator is not supported, it can be adjusted appropriately;
 
-ELF组合模式
-^^^^^^^^^^^
+elf combination mode
+^^^^^^^^^^^^^^^^^^^^
 
-通过参数 ``--elf_mode`` 或 ``-m`` 配置 **elf文件** 与 **so文件** 的组合模式，该参数只对SlimAI设备模型编译有效，其默认值为 **separate** 。
+Configure the combination mode of **elf** file and **so** file through the parameter ``--elf_mode`` or ``-m``. This parameter is only valid for SlimAI device model compilation, and its default value is **separate** .
 
-两种模式的区别如下图所示：
+The difference between the two modes is shown in the following figure:
 
 .. image:: ../_static/images/devp/elf_mode.png
 
@@ -327,21 +330,21 @@ ELF组合模式
 
    .. tab:: separate
 
-      模型编译时默认采用 **separate** 模式，该模式下，模型的 **so** 文件与 **elf** 文件独立生成。 其中，**elf** 文件包含所有模型的量化参数，**so** 文件只要包含对应模型的网络结构。
+      The **separate** mode is used by default when the model is compiled. In this mode, the **so** file and the **elf** file of the model are generated independently. Among them, the **elf** file contains the quantitative parameters of all models, and the **so** file only needs to contain the network structure of the corresponding model.
 
       .. note::
 
-         如果是多模型编译，该参数的设置无效，强制为 **separate** 模式, 且会生成多个模型的 **so** 文件和单个 **elf** 文件。
+         If it is a multi-model compilation, the setting of this parameter is invalid, it is forced to **separate** mode, and **so** files of multiple models and a single **elf** file will be generated.
 
    .. tab:: merge
 
-      只有单模型编译支持 **merge** 模式，该模式下，将模型的 **elf** 文件集成进模型的 **so** 文件中，最终编译只输出单个 **so** 文件。
+      Only single model compilation supports **merge** mode. In this mode, the **elf** file of the model is integrated into the **so** file of the model, and the final compilation only outputs a single **so** file.
 
       .. note::
 
-         该模式的存在主要方便快速测试，最终产品部署，建议采用 **separate** 模式。
+         The existence of this mode is mainly to facilitate rapid testing and final product deployment. It is recommended to use the **separate** mode.
 
-模型部署时，需要手动拷贝 **elf** 文件到目标板指定目录下：
+When deploying the model, you need to manually copy the **elf** file to the specified directory on the target board:
 
 - **linux** ： ``/lib/firmware``
 - **android** ： ``/vendor/firmware``
@@ -349,97 +352,92 @@ ELF组合模式
 
 .. warning::
 
-   qnx系统部署、多进程开发和Android系统APK代码开发都需要使用 **separate** 模式；
+   **separate** mode is required for qnx system deployment, multi-process development and Android system APK code development;
 
-ELF文件生成
-^^^^^^^^^^^
+elf file generation
+^^^^^^^^^^^^^^^^^^^
 
-通过参数 ``--elf_build_off`` 或 ``-b`` 配置是否关闭 **elf文件** 编译过程，该参数只对SlimAI设备模型编译有效，其默认值为 **False** 。
+Use the parameter ``--elf_build_off`` or ``-b`` to configure whether to turn off the **elf** file compilation process. This parameter is only valid for SlimAI device model compilation, and its default value is **False** .
 
 .. note::
 
-   #. 该参数用于控制 **elf文件** 是否重新生成，即控制是否对浮点模型进行量化操作；
-   #. 不添加该参数，会基于浮点模型重新量化生成新的 **elf文件** ；
-   #. 添加该参数则失效 **elf文件** 生成，一般使用场景是当模型第一次编译已经生成 **elf文件** 后，如果想生成其它 ``OS`` 的部署 **so文件** ，可以关闭生成elf文件，可以减少编译时间。
+   #. This parameter is used to control whether the **elf** file is regenerated, that is, whether to quantize and optimize the floating-point model;
+   #. If this parameter is not added, a new **elf** file will be generated based on the floating-point model requantization;
+   #. Adding this parameter will invalidate the **elf** file generation. The general usage scenario is that after the **elf** file has been generated by the first compilation of the model, if you want to generate other ``OS`` deployment **so** files , you can turn off the generation of elf files, which can reduce compilation time.
 
-量化参数
---------
+Quantization parameters
+-----------------------
 
-.. table:: 量化参数
+.. table:: Quantization parameters
    :name: quant_params
 
-   +-------------+----------+--------+-------------------+--------------------+
-   | 命令参数    | 缩略参数 | 默认值 | 可选范围          | 说明               |
-   +=============+==========+========+===================+====================+
-   | --quant_bit | -qb      |        | 8bit, 16bit, auto | 配置模型的量化位宽 |
-   +-------------+----------+--------+-------------------+--------------------+
+   +-------------+-------------+---------+-------------------+---------------------------------------------------+
+   | command     | abbreviated | default | range             | illustrate                                        |
+   +=============+=============+=========+===================+===================================================+
+   | --quant_bit | -qb         |         | 8bit, 16bit, auto | Configure the quantization bit width of the model |
+   +-------------+-------------+---------+-------------------+---------------------------------------------------+
 
+quantization bit width
+^^^^^^^^^^^^^^^^^^^^^^
 
-量化位宽
-^^^^^^^^
+Configure the model quantization bit width through the parameter ``--quant_bit`` or ``-qb``, currently **8bit** and **16bit** are optional.
 
-通过参数 ``--quant_bit`` 或 ``-qb`` 配置模型量化位宽，目前可选 **8bit** 、**16bit** 和 **auto** 。
+simulation debugging parameters
+-------------------------------
 
-.. note::
-   - auto模式还未支持，后续增加该功能；
-
-仿真调试参数
-------------
-
-.. table:: 仿真调试参数
+.. table:: Simulation debugging parameters
    :name: debug_params
 
-   +-------------------+----------+--------+----------+----------------------+
-   | 命令参数          | 缩略参数 | 默认值 | 可选范围 | 说明                 |
-   +===================+==========+========+==========+======================+
-   | --debug           | -d       | False  |          | 打印编译调试信息     |
-   +-------------------+----------+--------+----------+----------------------+
-   | --emu             | -e       | False  |          | 使能生成仿真模式文件 |
-   +-------------------+----------+--------+----------+----------------------+
-   | --dump_ir         | -ir      | False  |          | dump IR文件          |
-   +-------------------+----------+--------+----------+----------------------+
-   | --dump_quant_err  | -qe      | False  |          | dump 每层相似度      |
-   +-------------------+----------+--------+----------+----------------------+
-   | --dump_layer_prof | -lp      | False  |          | dump 每层性能信息    |
-   +-------------------+----------+--------+----------+----------------------+
-   | --dump_path       | -p       | dump   |          | dump 文件目录        |
-   +-------------------+----------+--------+----------+----------------------+
+   +-------------------+--------------+---------+-------+--------------------------------------------+
+   | command           | abbreviation | default | range | illustrate                                 |
+   +===================+==============+=========+=======+============================================+
+   | --debug           | -d           | False   |       | print compile debugging information        |
+   +-------------------+--------------+---------+-------+--------------------------------------------+
+   | --emu             | -e           | False   |       | Enable generation of simulation mode files |
+   +-------------------+--------------+---------+-------+--------------------------------------------+
+   | --dump_ir         | -ir          | False   |       | dump IR file                               |
+   +-------------------+--------------+---------+-------+--------------------------------------------+
+   | --dump_quant_err  | -qe          | False   |       | dump similarity at each level              |
+   +-------------------+--------------+---------+-------+--------------------------------------------+
+   | --dump_layer_prof | -lp          | False   |       | dump per-layer performance information     |
+   +-------------------+--------------+---------+-------+--------------------------------------------+
+   | --dump_path       | -p           | dump    |       | dump file directory                        |
+   +-------------------+--------------+---------+-------+--------------------------------------------+
 
 
-Debug模式
-^^^^^^^^^
+debug mode
+^^^^^^^^^^
 
-通过参数 ``--debug`` 或 ``-d`` 配置，其默认值为 **False** 。
-
-.. note::
-
-   开启Debug模式编译，会输出编译阶段的中间信息，并保存相关调试信息，便于模型编译的调试。
-
-仿真模型文件生成
-^^^^^^^^^^^^^^^^
-
-通过参数 ``--emu`` 或 ``-e`` 配置仿真模式的模型文件生成，其默认值为 **False** 。
+Configured by the parameter ``--debug`` or ``-d``, its default value is **False** .
 
 .. note::
 
-   仿真模型文件生成目前只有slimai加速设备支持
+   When Debug mode is enabled for compilation, the intermediate information of the compilation phase will be output, and the relevant debugging information will be saved, which is convenient for the debugging of model compilation.
+
+generate simulation model file
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Model file generation for simulation mode is configured via the parameter ``--emu`` or ``-e``, which defaults to **False** .
+
+.. note::
+
+   Simulation model file generation is currently only supported by slimai acceleration devices.
 
 
-Dump Relay IR信息
-^^^^^^^^^^^^^^^^^
+dump relay ir information
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
-通过参数 ``--dump_ir`` 或 ``-ir`` 配置生成模型的Relay IR信息文件，文件会保存在 ``--dump_path`` 参数指定的路径，其默认值为 **False** 。
+Configure the Relay IR information file of the generated model through the parameter ``--dump_ir`` or ``-ir``, the file will be saved in the path specified by the ``--dump_path`` parameter, and its default value is **False** .
 
+dump quantization error information
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Dump 量化误差信息
-^^^^^^^^^^^^^^^^^
+Configure the quantization error analysis file for each layer of the generated model through the parameter ``--dump_quant_err`` or ``-qe``, the file will be saved in the path specified by the ``--dump_path`` parameter, and its default value is **False** .
 
-通过参数 ``--dump_quant_err`` 或 ``-qe`` 配置生成模型每层量化误差分析文件，文件会保存在 ``--dump_path`` 参数指定的路径，其默认值为 **False**。
-
-量化相似度分析报告格式说明
+similarity snalysis report
 """"""""""""""""""""""""""
 
-相似度报告similarity.txt最终输出如下数据，即相同节点的量化前后的余弦相似度。
+The similarity report similarity.txt finally outputs the following data, that is, the cosine similarity before and after quantization of the same node.
 
 .. code-block:: bash
    :linenos:
@@ -448,8 +446,9 @@ Dump 量化误差信息
    The similarity of nn_bias_add_750 between fixed and float model is: 0.999363
    ...
 
-上述余弦相似度的值是此节点在所有验证图片上的均值。和量化相似度分析报告同目录会一起有很多文件，
-命名风格为：网络名称_数字， 网络名称_ref，如下：
+The above cosine similarity value is the mean of this node over all validation images. There are many files in the same directory as the quantitative similarity analysis report.
+The naming style is: netname_number, netname_ref, as follows:
+
 
 .. code-block:: bash
    :linenos:
@@ -462,7 +461,9 @@ Dump 量化误差信息
    ...
    mobilenet_v2_ref
 
-其中网络名称_数字的文件夹如mobilenet_v2_97， 存放的是此网络在range参数为97时候的定点输出，网络名称_ref的文件夹包含的是此网络的浮点输出。每个文件夹中包含大量blob文件，如下：
+The folder of network name **_number** such as mobilenet_v2_97,It stores the fixed-point output of this network when the range parameter is 97, and the folder with the network name **_ref** contains the floating-point output of this network. 
+
+Each folder contains a large number of blob files, as follows:
 
 .. code-block:: bash
    :linenos:
@@ -471,7 +472,7 @@ Dump 量化误差信息
    cat_add_200.blob
    cat_add_290.blob
 
-上面示例中，cat代表的是图片的名字，add_*代表的是节点的名字，整个代表的是在输入图片为cat.png时候add_190、add_200、add_290节点的输出。进去blob中，第一行记录的是数据的缩放因子和维度以及数据格式。如下cat_add_190.blob中。
+In the above example, cat represents the name of the image, **add_xxx** represents the name of the node, and the whole represents the output of the add_190, add_200, and add_290 nodes when the input image is cat.png. In the blob, the first line records the scaling factor and dimension of the data and the data format. As follows in cat_add_190.blob.
 
 .. code-block:: bash
    :linenos:
@@ -479,148 +480,148 @@ Dump 量化误差信息
    63.499031 7 160 7 1 S8
    ...
 
-64.499031为缩放的因子，7 160 7 1为此节点输出的维度，S8为数据的类型。从第二行开始为实际数据。
+#. ``64.499031`` : the scaling factor;
+#. ``7 160 7 1`` : the output dimension of this node;
+#. ``S8`` : the data type. The actual data starts from the second row.
 
+dump performance information
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Dump 模型每层性能信息
-^^^^^^^^^^^^^^^^^^^^^
+Configure the performance analysis file of the generated model through the parameter ``--dump_layer_prof`` or ``-lp``, the file will be saved in the path specified by the ``--dump_path`` parameter, and its default value is **False** .
 
-通过参数 ``--dump_layer_prof`` 或 ``-lp`` 配置生成模型的性能分析文件，文件会保存在 ``--dump_path`` 参数指定的路径，其默认值为 **False** 。
+Performance Analysis Report Format Description
+""""""""""""""""""""""""""""""""""""""""""""""
 
-性能分析报告格式说明
-""""""""""""""""""""
-
-分析报告最终会输出如下数据，即网络的帧率：
+The analysis report will eventually output the following data, which is the frame rate of the network:
 
 .. code-block:: bash
    :linenos:
 
    PERFORMANCE 120.10 FPS @748.00MHz
 
-根据DSP的时钟频率748MHZ，可以计算得出一个时钟周期为1.3369ns，则总的网络推理时间计算方式如下：
+According to the DSP clock frequency of 748MHZ, it can be calculated that one clock cycle is 1.3369ns, and the total network inference time is calculated as follows:
 
 .. math::
 
    time_{Inference}= cycles_{total} * clock_{cycle}
 
-同理，根据每层网络的时钟周期数可以计算每层网络的耗时，但需要注意的是，仿真输出的层名与原始模型的层名不一定能够匹配，仿真输出的层名，是多算子融合和优化的结果。
+In the same way, the time-consuming of each layer of network can be calculated according to the number of clock cycles of each layer of network, but it should be noted that the layer name of the simulation output may not match the layer name of the original model. The result of operator fusion and optimization.
 
-   +----------------------+-------------------------------------------+
-   | 参数                 | 含义                                      |
-   +======================+===========================================+
-   | Total Cycles         | 该层网络总的时钟周期                      |
-   +----------------------+-------------------------------------------+
-   | XI Kernel Cycles     | 该层网络内核计算周期数                    |
-   +----------------------+-------------------------------------------+
-   | Edge Ext Cycles      | 该层网络边沿计算周期数                    |
-   +----------------------+-------------------------------------------+
-   | DSP Idle WAIT Cycles | 该层网络DSP空闲等待周期数                 |
-   +----------------------+-------------------------------------------+
-   | MACs per Cycles      | 该层网络每个时钟周期所使用的MAC单元数量   |
-   +----------------------+-------------------------------------------+
-   | MAC%                 | 该层网络的MAC单元利用率                   |
-   +----------------------+-------------------------------------------+
-   | MACs                 | 计算该层网络总共的MAC单元数量             |
-   +----------------------+-------------------------------------------+
-   | DMA Queue Size       | 该层网络使用的DMA队列数量                 |
-   +----------------------+-------------------------------------------+
-   | Layer Name           | 该层网络命名 [注：与原始模型的层名不对应] |
-   +----------------------+-------------------------------------------+
+   +----------------------+----------------------------------------------------------------------------------------------------+
+   | parameter            | meaning                                                                                            |
+   +======================+====================================================================================================+
+   | Total Cycles         | The total clock cycle of this layer of network                                                     |
+   +----------------------+----------------------------------------------------------------------------------------------------+
+   | XI Kernel Cycles     | The number of computation cycles of the network kernel at this layer                               |
+   +----------------------+----------------------------------------------------------------------------------------------------+
+   | Edge Ext Cycles      | The number of network edge calculation cycles at this layer                                        |
+   +----------------------+----------------------------------------------------------------------------------------------------+
+   | DSP Idle WAIT Cycles | The number of idle waiting cycles of the network DSP of this layer                                 |
+   +----------------------+----------------------------------------------------------------------------------------------------+
+   | MACs per Cycles      | The number of MAC units used per clock cycle of the network at this layer                          |
+   +----------------------+----------------------------------------------------------------------------------------------------+
+   | MAC%                 | MAC unit utilization of this layer of network                                                      |
+   +----------------------+----------------------------------------------------------------------------------------------------+
+   | MACs                 | Calculate the total number of MAC units in this layer of network                                   |
+   +----------------------+----------------------------------------------------------------------------------------------------+
+   | DMA Queue Size       | The number of DMA queues used by the network at this layer                                         |
+   +----------------------+----------------------------------------------------------------------------------------------------+
+   | Layer Name           | The network name of this layer [Note: does not correspond to the layer name of the original model] |
+   +----------------------+----------------------------------------------------------------------------------------------------+
 
-Dump 路径
+dump path
 ^^^^^^^^^
 
-通过参数 ``--dump_path`` 或 ``-p`` 配置dump文件的保存路径，其默认值为 **dump** 。
+Configure the save path of the dump file through the parameter ``--dump_path`` or ``-p``, the default value is **dump** .
 
-预处理参数
-----------
+Preprocessing parameters
+------------------------
 
-.. table:: 预处理参数
+.. table:: Preprocessing parameters
    :name: preprocess_params
 
-   +-----------------+----------+--------+----------+--------------+
-   | 命令参数        | 缩略参数 | 默认值 | 可选范围 | 说明         |
-   +=================+==========+========+==========+==============+
-   | --channel_order | -co      | RGB    | RGB, BGR | 颜色通道循序 |
-   +-----------------+----------+--------+----------+--------------+
-   | --mean          |          |        |          | 平均值       |
-   +-----------------+----------+--------+----------+--------------+
-   | --std           |          |        |          | 方差         |
-   +-----------------+----------+--------+----------+--------------+
-   | --dataset       | -ds      |        | ImageNet | 数据集       |
-   +-----------------+----------+--------+----------+--------------+
+   +-----------------+--------------+---------+----------+---------------------+
+   | command         | abbreviation | default | range    | illustrate          |
+   +=================+==============+=========+==========+=====================+
+   | --channel_order | -co          | RGB     | RGB, BGR | calor channel order |
+   +-----------------+--------------+---------+----------+---------------------+
+   | --mean          |              |         |          | the average value   |
+   +-----------------+--------------+---------+----------+---------------------+
+   | --std           |              |         |          | the variance        |
+   +-----------------+--------------+---------+----------+---------------------+
+   | --dataset       | -ds          |         | ImageNet | data set            |
+   +-----------------+--------------+---------+----------+---------------------+
 
-模型输入通道次序
-^^^^^^^^^^^^^^^^
+input channel order
+^^^^^^^^^^^^^^^^^^^
 
-通过参数 ``--channel_order`` 或 ``-co`` 配置模型输入通道格式，目前可选值为 **RGB** 或 **BGR** 。
+Configure the model input channel format through the parameter ``--channel_order`` or ``-co``, currently the optional value is **RGB** or **BGR** .
 
-模型输入平均值
-^^^^^^^^^^^^^^
-
-通过参数 ``--mean`` 配置，通道数值通过 ``,`` 字符分隔，中间不能有空格符号。
-
-.. note::
-
-   例如--mean 1.23,45.67,8.0
-
-模型输入方差
-^^^^^^^^^^^^
-
-通过参数 ``--std`` 配置，通道数值通过 ``,`` 字符分隔，中间不能有空格符号。
-
-.. note::
-
-   例如--std 1.2,32.34,34.34
-
-
-数据集
-^^^^^^
-
-通过参数 ``--dataset`` 或 ``-ds`` 配置模型的数据集类型，目前支持 **ImageNet** 数据集处理。
-
-
-后处理参数
-----------
-
-.. table:: 后处理参数
-   :name: postprocess_params
-
-   +-----------------+----------+---------+---------------+------------------------+
-   | 命令参数        | 缩略参数 | 默认值  | 可选范围      | 说明                   |
-   +=================+==========+=========+===============+========================+
-   | --output_layout | -ol      |         | NCHW, NHWC    | 设置模型输出节点layout |
-   +-----------------+----------+---------+---------------+------------------------+
-   | --metric        | -mt      | BinData | BinData, TopK | metric方法             |
-   +-----------------+----------+---------+---------------+------------------------+
-   | --metric_params | -mp      |         |               | metric参数             |
-   +-----------------+----------+---------+---------------+------------------------+
-
-
-输出通道布局
-^^^^^^^^^^^^
-
-通过参数 ``--output_layout`` 或 ``-ol`` 配置是否在模型输出节点添加transpose算子，进行输出节点的通道变换，其默认值为 **False** 。
-
-.. note::
-
-   #. 模型输出节点维度必须是4,才能使能该选项；
-   #. 参数值表示的是通道目标布局，即原模型如果输出格式是NCHW，则设置参数-ol NHWC，则会在模型输出节点基础上添加tranpose算子，实现NCHW到NHWC的变换。
-
-metric方法
+input mean
 ^^^^^^^^^^
 
-通过参数 ``--metric`` 或 ``-mt`` 配置模型的测量方法，其默认值为 **BinData** 。
+Configured by the parameter ``--mean``, the channel values are separated by ``,`` characters, and there can be no space symbols in between.
 
-metric 参数
-^^^^^^^^^^^
+.. note::
 
-通过参数 ``--metric_params`` 或 ``-mp`` 配置模型的测量方法的参数。
+   for example: --mean 1.23,45.67,8.0
 
-   +---------+-----------------+-------------------------+
-   | 方法    | 参数            | 说明                    |
-   +=========+=================+=========================+
-   | BinData | 无              | 保存模型输出通道数据    |
-   +---------+-----------------+-------------------------+
-   | TopK    | 参数k: k1,k2,k3 | 计算前K个权重大值的索引 |
-   +---------+-----------------+-------------------------+
+input variance
+^^^^^^^^^^^^^^
+
+Configured by the parameter ``--std``, the channel values are separated by ``,`` characters, and there can be no space symbols in between.
+
+.. note::
+
+   for example: --std 1.2,32.34,34.34
+
+
+data set
+^^^^^^^^
+
+Configure the dataset type of the model through the parameter ``--dataset`` or ``-ds``, currently supports **ImageNet** dataset processing.
+
+Postprocessing parameters
+-------------------------
+
+.. table:: Postprocessing parameters
+   :name: postprocess_params
+
+   +-----------------+--------------+---------+---------------+----------------------------------+
+   | command         | abbreviation | default | range         | illustrate                       |
+   +=================+==============+=========+===============+==================================+
+   | --output_layout | -ol          |         | NCHW, NHWC    | Set the model output node layout |
+   +-----------------+--------------+---------+---------------+----------------------------------+
+   | --metric        | -mt          | BinData | BinData, TopK | metric method                    |
+   +-----------------+--------------+---------+---------------+----------------------------------+
+   | --metric_params | -mp          |         |               | metric parameter                 |
+   +-----------------+--------------+---------+---------------+----------------------------------+
+
+
+output channel layout
+^^^^^^^^^^^^^^^^^^^^^
+
+Use the parameter ``--output_layout`` or ``-ol`` to configure whether to add a transpose operator to the model output node to perform channel transformation of the output node. The default value is **False** .
+
+.. note::
+
+   #. The model output node dimension must be 4 to enable this option;
+   #. The parameter value represents the channel target layout, that is, if the output format of the original model is NCHW, and the parameter -ol NHWC is set, the tranpose operator will be added on the basis of the model output node to realize the transformation from NCHW to NHWC.
+
+metric method
+^^^^^^^^^^^^^
+
+Configure the measurement method of the model through the parameter ``--metric`` or ``-mt``, which defaults to **BinData** .
+
+metric parameter
+^^^^^^^^^^^^^^^^
+
+Configure the parameters of the model's measurement method via the parameter ``--metric_params`` or ``-mp``.
+
+   +---------+-------------+------------------------------------------------+
+   | method  | parameter   | illustrate                                     |
+   +=========+=============+================================================+
+   | BinData | None        | Save model output channel data                 |
+   +---------+-------------+------------------------------------------------+
+   | TopK    | k: k1,k2,k3 | Calculate the index of the top K weight values |
+   +---------+-------------+------------------------------------------------+

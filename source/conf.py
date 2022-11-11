@@ -42,7 +42,19 @@ extensions = [
   'sphinx.ext.viewcode',
   'sphinx.ext.githubpages',
   'sphinx_tabs.tabs',
+  'sphinxmark',
 ]
+
+sphinxmark_enable = True
+sphinxmark_div = 'document'
+sphinxmark_image = 'text'
+#sphinxmark_text = "SemiDrive Confidential For Desay Use Only"
+#sphinxmark_text = "SemiDrive Confidential For xxx Use Only"
+sphinxmark_text = "SemiDrive Confidential For Internal Use Only"
+sphinxmark_text_size = 40
+sphinxmark_text_width = 1500
+sphinxmark_text_rotation = 45
+sphinxmark_text_spacing = 800
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
