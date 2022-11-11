@@ -1,15 +1,15 @@
-========
-模型推理
-========
+================
+Model inference
+================
 
-完成模型编译后，就可以调用API接口编写应用代码。关于API接口的使用方法，请获取 **examples** 仓库代码，里面包含详尽的接口说明。目前提供　``TVM API`` 和 ``SDNN API``　两套接口，可以根据实际场景选择合适的API接口。
-如果目前不关注API接口如何使用，只想验证模型推理性能或结果，可以直接下载sdnn_test程序，将其拷贝到板子上，便可以进行模型推理。
+You can call the model interface API in application code to do inference via the compiled model. For how do model inference, please refer to ** examples **  repository code, which contains detailed user cases. Currently, two sets of interfaces are provided: ``standard TVM API`` and ``SDNN API``. Choose appropriate API set according to your application scenario.
+If you just want to simply get performance or output of the compiled model given specific input, you can resort to to ``sdnn_test`` after uploading appropriate test tool to your board system.
 
-模型layout判断
-==============
+Input and output layout
+=========================
 
-对于slimai模型，在启动智能搜索的模式下，实际模型推理的输入和输出的layout格式可能与配置文件中的不一致，此时需要参考编译log输出信息，确定最终的layout格式。
-一般Optimizing 阶段结束后，会打印出如下关键信息：
+The input and output layout may change due to optimization, so you need refer to compile log for final layout format of compiled model.
+At the end of optimization phase of compilation, you will see the layout infomation in the log as:
 
 .. code-block:: bash
 
@@ -34,55 +34,55 @@
 Neural Network Inputs
 ---------------------
 
-该字段包含模型输入节点的信息，其中layout属性需要特别注意，编译log中的layout循序与通用的排列格式是反向。例如，上述layout格式为WHD，对应通用的CHW格式。
+This line will print out the input infomation of compiled model. You need to pay more attention to the layout attribute, the layout in the compilation log is in a reversed sequence from the conventional arrangement format, as in the example showed above, the layout WHD corrsponds to conventional layout notation CHW.
 
 Neural Network Outputs
 ----------------------
 
-该字段与输入一致，其中layout和dimensions需要编译后特别关注。
+The same as input, here DWH means HWC in conventional way.
 
 
 examples
 ========
 
-examples主要用于说明如何使用 ``API`` 接口和如何在不同的目标设备上部署模型。
+Examples are released for telling how to use ``API`` to deploy compiled model to different target devices.
 
-获取源码
---------
+Get source code
+-----------------
 
-获取examples代码，代码仓库地址从客户支持系统上获取。
+Get the examples codebase URL from `Semidrive Customer support<https://www.semidrive.com/>`_
 
-编译APP
--------
+compile APP
+------------
 
-使用example进行示例编译前，需要进入examples的根目录，执行以下指令进行环境变量的设置：
+Before compiling a test case project in the examples, you need to enter the root directory of examples and execute the following instructions to set the environment variables:
 
 .. code-block:: bash
 
    $ source envsetup.sh
 
 
-然后进入examples/apps目录，调用build_app.sh脚本进行app的编译，例如，编译aarch64-linux平台的应用，命令如下：
+Then enter directory ``examples/apps``, run build_app.sh to compile app for different deploy platform, following is an example for aarch64-linux app compilation:
 
 .. code-block:: bash
 
    $ ./build_app.sh -p aarch64-linux -d app_api/sdnn_api/
 
 
-sdnn_test工具
+sdnn_test
 =============
 
-``sdnn_test`` 工具包含如下功能：
+``sdnn_test`` tool functions:
 
-#. SlimAI设备自检；
-#. 模型性能评估；
-#. 模型精度评估(分类)；
+#. SlimAI device probe and test;
+#. Model profiling;
+#. Model precision evaluation(Currently classfication only)
 
 
-获取工具
+Get tool
 --------
 
-获取不同平台的测试工具：
+Get sdnn_test for different platform:
 
 .. tabs::
 
@@ -103,10 +103,10 @@ sdnn_test工具
       `sdnn_test_qnx <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/aarch64-qnx_sdnn_test.tgz>`_
 
 
-帮助信息
---------
+Help info
+----------
 
-``sdnn_test`` 运行时添加 ``--help`` 或 ``-h`` 参数，可以输出软件相关信息：
+Run ``sdnn_test`` with option ``--help`` or ``-h``, help information will list:
 
 .. code-block:: bash
    :linenos:
@@ -130,33 +130,33 @@ sdnn_test工具
       deploy_json
               The path of deploy json file.
 
-关于指令参数，详细说明如下：
+detailed explanation for options:
 
-.. table:: 应用参数
+.. table:: application params
    :name: sdnn_test_params
 
-   +---------------+------+--------+------+--------------------------+
-   | 参数          | 缩略 | 默认值 | 状态 | 说明                     |
-   +===============+======+========+======+==========================+
-   | image         |      |        | 必须 | 设置数据集路径或单张图片 |
-   +---------------+------+--------+------+--------------------------+
-   | deploy_json   |      |        | 必须 | 设置部署json文件         |
-   +---------------+------+--------+------+--------------------------+
-   | --help        | -h   | true   | 可选 | 打印帮助信息             |
-   +---------------+------+--------+------+--------------------------+
-   | --debug       | -d   | false  | 可选 | 使能调试信息输出         |
-   +---------------+------+--------+------+--------------------------+
-   | --performance | -p   | false  | 可选 | 使能性能信息输出         |
-   +---------------+------+--------+------+--------------------------+
-   | --accuracy    | -a   | false  | 可选 | 使能精度信息输出         |
-   +---------------+------+--------+------+--------------------------+
-   |               | -n   | 10     | 可选 | 设置模型推理次数         |
-   +---------------+------+--------+------+--------------------------+
+   +---------------+------+--------+----------+--------------------------+
+   | params        | Abbr |default | Required | descriptions             |
+   +===============+======+========+==========+==========================+
+   | image         |      |        | true     | image or image dir path  |
+   +---------------+------+--------+----------+--------------------------+
+   | deploy_json   |      |        | true     | compile created json file|
+   +---------------+------+--------+----------+--------------------------+
+   | --help        | -h   | true   | false    | print help info          |
+   +---------------+------+--------+----------+--------------------------+
+   | --debug       | -d   | false  | false    | enable debug info output |
+   +---------------+------+--------+----------+--------------------------+
+   | --performance | -p   | false  | false    | enable perf info output  |
+   +---------------+------+--------+----------+--------------------------+
+   | --accuracy    | -a   | false  | false    | enable accuracy output   |
+   +---------------+------+--------+----------+--------------------------+
+   |               | -n   | 10     | false    | inference iteration num  |
+   +---------------+------+--------+----------+--------------------------+
 
-自检
-----
+Device Status Test
+--------------------
 
-运行 ``sdnn_test`` 程序可以用于运行环境的自检，输出如下 **LOG** ：
+Run ``sdnn_test`` will print device status **LOG** :
 
 .. code-block:: bash
    :linenos:
@@ -171,15 +171,15 @@ sdnn_test工具
    |  elf load    |  Pass  |
    |-----------------------|
 
-#. **xrp driver** : 检查xrp驱动是否安装；
-#. **xrp node** ： 检查设备节点是否正确生成；
-#. **elf load** : 检查elf文件是否正确加载；
+#. **xrp driver** : check communication library driver status for SlimAI
+#. **xrp node** : check status of communication node on host side
+#. **elf load** : check load status of SlimAI device executive file
 
 
-调试信息
---------
+Debug info
+------------
 
-``sdnn_test`` 运行时添加 ``--debug`` 或 ``-d`` 参数，使能调试信息输出，输出 **LOG** 如下：
+Run ``sdnn_test`` with option ``--debug`` or ``-d`` will enable debug information output as:
 
 .. code-block:: bash
    :linenos:
@@ -203,23 +203,23 @@ sdnn_test工具
    |SDNN Runtime | V2.2.1  |
    |-----------------------|
 
-调试信息输出包括，加载模型的路径、数据集方法和测试方法等。
+Debug information includes model path, dataset methed and metric methed.
 
-软件版本
-^^^^^^^^
+Software Version
+^^^^^^^^^^^^^^^^^
 
-包含 ``sdnn_test`` 软件版本号和tvm runtime库的版本号。其中，runtime库的版本用于判断模型so库是否于runtime库版本匹配。
+This Table includes version of ``sdnn_test`` and version of tvm runtime library. you can check whether the runtime version matches the build tool version.
 
-节点结构
-^^^^^^^^
+Node
+^^^^^
 
-包含输入和输出节点的结构信息，通过该信息可以判断部署网络的输入输出结构信息。
+This table includes layout information for input and output.
 
 
-性能评估
---------
+Performance
+------------
 
-``sdnn_test`` 运行时添加 ``--performance`` 或 ``-p`` 参数，使能模型性能评估功能，输出LOG如下：
+Run ``sdnn_test`` with option ``--performance`` or ``-p`` will enable performance output as:
 
 .. code-block:: bash
    :linenos:
@@ -241,15 +241,15 @@ sdnn_test工具
    |  FPS   |     118.76
    |--------|-----------------|
 
-- **mean** : 模型推理 ``n`` 次的平均值；
-- **std** : 模型推理 ``n`` 次的方差值；
-- **FPS** : 模型推理的帧率；
+- **mean** : average time over ``n`` times inferences;
+- **std** : inference time standard variance  over ``n`` times inferences;
+- **FPS** : inference throughput in frame per second
 
 
-精度评估
---------
+Precision evaluation
+----------------------
 
-``sdnn_test`` 运行时添加 ``--accuracy`` 或 ``-a`` 参数，使能模型精度评估功能，输出LOG如下：
+Run ``sdnn_test`` with option ``--accuracy`` or ``-a`` will enable precision evlation, LOG would be printed as:
 
 .. code-block:: bash
    :linenos:
@@ -267,13 +267,13 @@ sdnn_test工具
    |  281  | 8.856 | tabby, tabby cat
    |------------------------------|
 
-目前支持分类模型的 **TopK** 精度评估，其它类别模型的精度评估，可以采用 **BinData** 形式，先将模型推理输出结果保存为 **bin** 格式文件，然后通过python等脚本语言对数据进行模型的后处理，来评估模型精度。
+Currently only **TopK** is supported for classfication model. If you need to evaluate precision of other type model, you have to use **BinData** currently, which save model output as **bin** file, then write your precision evaluation code in python or any languege you prefer to finish the precision evaluation.
 
 
-部署json格式说明
-----------------
+deploy.json format
+-------------------
 
-``sdnn_build`` 工具编译模型会同时生成 ``模型库文件(so)`` 和 ``部署配置文件(.deploy.json)`` ，通过编译时指定 ``--save`` 参数，可指定文件的保存路径。 关于json文件的格式详见如下：
+``sdnn_build`` will produce  ``model library(so)`` and ``deploy config file(.deploy.json)`` simutanously. You can use option ``--save`` to define output path. Json file looks as follow:
 
 .. code-block:: json
 
@@ -313,123 +313,113 @@ sdnn_test工具
      }
    }
 
-
 .. note::
 
-   使用sdnn_test程序评估模型前，请先确认.deploy.json配置文件的参数 **设置正确** 。
+   Verify that the automatically created parameters of the deploy.json are set **correctly** before you using it.
 
 
-model字段
-^^^^^^^^^
+model section
+^^^^^^^^^^^^^
 
 name
 """"
 
-设置模型别名，该属性编译时会自动生成，不需要特别关注。
+Model alias, it is automatically generated by compiler, you can modify it as your preference.
 
 accelerator
 """""""""""
 
-设置模型推理的设备类型，编译时该属性值会自动生成，一般会与 path 字段的模型so文件匹配。如果修改该参数，需要确保 path 字段的so文件与新设置的加速器类型匹配。
+Inference execute device type, it is automatically generated by compiler and change with ``path`` value due to different accelerator compiling configuration. If you want to modify this parameter, you need to modify  ``path`` value together to ensure that the correct so file which matches the newly set accelerator type will be loaded.
 
 path
 """"
 
-设置推理模型文件的加载路径，编译时该属性值会自动生成，如果模型 **so文件** 存放路径与 **部署json文件** 不在同级目录，需要修改该属性值，采用相对路径方式，相对该json文件。
+Model path, it is automatically generated by compiler  and change with ``accelerator`` value due to different accelerator compiling configuration. if the path of compiled model **so file** is not in the same directory where **deploy.json file** stays in, set this value as the relative path to the json file.
 
 domain
 """"""
 
-设置模型所属领域，该属性在 **dataset** 和 **metric** 字段未设置时，根据指定领域属性，设置模型前后处理的默认参数。
+Model domain, it is used to define default preprocess and postprocess when **dataset** and **metric** attribute values are not set.
 
 inputs
 """"""
 
-设置模型输入节点的属性，支持多输入格式，按照数组方式指定不同输入节点的参数。
+Input nodes attribute list,  it specifies the parameters of each input node in an array manner, single or multiple inputs are formed as a list.
 
 1. **name**
 
-   设置模型输入节点的名称，该属性值，编译时会字段填充。该属性用于模推理时，指定模型
+   Input node name, it is  automatically generated by compiler.
 
 2. **layout**
 
-   设置模型输入节点的结构，该属性值，编译时会字段填充。
+   Input node layout, it is automatically generated by compiler referring to the compile configuration
 
 3. **channel_order**
 
-   设置模型通道循序是否交换。
+   Input node channel order, it is automatically generated by compiler referring to the compile configuration
 
 4. **mean**
 
-   设置输入节点每个通道的平均值，如果编译时配置文件中已经设置，该属性会继承过来。
+   Mean value of each channel of input node, it is automatically generated by compiler referring to the compile configuration
 
 5. **std**
 
-   设置输入节点每个通道的方差值，如果编译时配置文件中已经设置，该属性会继承过来。
+   Standard variance of each channel of input node, it is automatically generated by compiler referring to the compile configuration
 
 .. note::
 
-   **mean** 和 **std** 属性值对于slimai设备部署时会忽略，其在编译时已经集成到模型文件中。
+   **mean** and **std** will be skipped when ``slimai`` as accelerator, due to normalization process they defined has been integrated into model computations.
 
-dataset字段
-^^^^^^^^^^^
+dataset section
+^^^^^^^^^^^^^^^^
 
-数据集字段，设置模型推理时使用的数据集类型，该字段作用于模型推理的前处理。默认采用 **ImageNet** 数据集处理方式。
+Dataset type used in model inference, it defines preprocess type.
 
 name
 """"
 
-根据模型训练的数据集类型，设置name属性。目前支持 **ImageNet** 数据集的前处理。
+Training dataset type name. Currently only **ImageNet** dataset preprocess is supported.
 
-Metric字段
-^^^^^^^^^^
+metric section
+^^^^^^^^^^^^^^^
 
-关于模型精度测试，可以设置metric属性。编译时如果不指定，默认采用BinData格式输出。
+Metric used in precision evaluation, Default value ``BinData``.
 
 method
 """"""
 
-目前支持的method方法有 **BinData** 和 **TopK** 两种。其中BinData支持所有模型，TopK可以支持常见的分类模型评估。
+Currently **BinData** and **TopK**  are supported: TopK for classfication precision evaluation, BinData for others.
 
 params
 """"""
 
-该字段设置method的具体参数，以数组形式保存，可以按照循序设置不同的参数。
+Parameters list used for metric.
 
 annotation
 """"""""""
 
-该字段设置标注文件的路径，如果需要评估模型的精度，可以设置数据集的标注文件。目前支持ImageNet数据集的评估。
+Annotation file path.
 
-sdnn_test使用
--------------
+sdnn_test usage
+----------------
 
-使用 ``sdnn_test`` 工具可以快速评估模型的性能，关于模型推理的准确性，可以采用BinData的方式，将模型的输出张量结果保存为binary文件，后续可以通过python脚本读取该文件进行相关后处理评估。关于直接评估模型的准确性，目前支持TopK方法，可以指定数据集评估精度或者指定单张图片评估分类网络的准确性，其它类型网络的评估方法后续会陆续支持。
+``sdnn_test`` can  be used to evaluate model performance.
 
 
-模型评估方式
+Model test
 ^^^^^^^^^^^^
 
-基于主机评估
+Test in x86
+"""""""""""""
+
+You can evalueate your model in docker immediately after the compiled model is generated by x86_64 format sdnn_test. Currently sdnn_test support cpu and slimai-simulator device on x86 computer, so you need to use option ``-emu`` to compile simulator model and a .sim.so model file will be generated to feed x86 version sdnn_test.
+
+Test on chip
 """"""""""""
 
-该方式在docker容器中直接评估模型，请下载x86_64格式的sdnn_test工具，目前可以支持cpu和slimai设备的评估，不过slimai设备需要开启-emu模式编译模型，会生成.sim.so模型文件。
+Download appropriate version sdnn_test according to your board system, linux,Android or QNX. Copy model file(.so) and deploy config file(.deploy.json) into your board system, and make sure you have installed and setup environment for the runtime and OpenCV libraries, Then you can run sdnn_test on chip now.
 
-基于芯片评估
-""""""""""""
-
-根据芯片所运行的os，下载合适的sdnn_test程序，目前支持linux,android和qnx操作系统。然后将模型(.so)和部署配置文件(.deploy.json)拷贝到板子上，最后确保板子上已经配置好runtime库和opencv库，就可以直接运行sdnn_test进行评估。
-
-
-sdnn_test参数项
-使用sdnn_test应用，有两个必需设置的参数。第一参数是数据的设置，第二个参数是部署配置文件的设置。
-数据
-数据项可以指定单张图片或者设置数据集的目录，测试图片可以从提供的examples/dataset目录获取。
-配置文件
-指定编译生成的部署配置文件(.deploy.json)，该文件包含模型预处理和后处理相关信息。该文件会在编译时自动生成，并和模型so文件在同级目录下。验证模型时，需要将xxx.deply.json和xxx.so文件同时拷贝到板子上验证。
-
-
-示例
+Demo
 ^^^^
 
 .. code-block:: bash

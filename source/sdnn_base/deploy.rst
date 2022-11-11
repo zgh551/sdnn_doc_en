@@ -1,297 +1,209 @@
-============
-部署环境配置
-============
+====================================
+Deploy environment configuration
+====================================
 
-可以通过 `客户支持系统 <https://www.semidrive.com/>`_ ，获取相应系统的runtime库文件，也可通过如下链接点击下载。
+Get required runtime lib files form `Semidrive Customer support<https://www.semidrive.com/>`_ , or click and download them from links listed below:
 
 .. tabs::
 
    .. tab:: Linux
 
-      1. `linux_runtime库 <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/aarch64-linux.tgz>`_
-      2. `linux_opencv库 <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/opencv_deploy_linux.run>`_
+      1. `linux_runtime installation package <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/aarch64-linux.tgz>`_
+      2. `linux_opencv installer <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/opencv_deploy_linux.run>`_
 
    .. tab:: Android
 
-      1. `环境配置脚本 <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/android_envsetup.sh>`_
-      2. `android_libcpp库 <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/libcpp_shared_android.run>`_
-      3. `android_runtime库 <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/aarch64-android.tgz>`_
-      4. `android_opencv库 <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/opencv_deploy_android.run>`_
+      1. `development environment configuration script <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/android_envsetup.sh>`_
+      2. `android_libcpp installer  <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/libcpp_shared_android.run>`_
+      3. `android_runtime installation package <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/aarch64-android.tgz>`_
+      4. `android_opencv installer  <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/opencv_deploy_android.run>`_
 
    .. tab:: QNX
 
-      1. `qnx_runtime库 <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/aarch64-qnx.tgz>`_
+      1. `qnx_runtime installation package <https://gitee.com/zgh551/sdnn_doc/releases/download/2.2.3/aarch64-qnx.tgz>`_
 
-.. important::
 
-   #. 部署环境中的runtime库版本一定要与sdnn_build工具版本一致，不要新旧版本混淆使用，否则模型推理会出现不可预知的错误；
-   #. 每次升级一次sdnn_build工具，板子上的runtime库建议也同时升级；
+   .. important::
 
-Linux环境
-=========
+      #. The runtime lib version must align with sdnn_build version, or it may cause uncertainties.
+      #. Please update the runtime lib in the deploy environment after each upgrade of the sdnn build tool in compile environment.
 
-mount操作
+
+Deploy on Linux board
+======================
+
+Remount
 ---------
 
-因为一些依赖库需要部署到系统目录，当板子启动后，如果需要部署依赖库，先确保当前用户具备系统根目录的读写权限，具体操作如下：
+Because some libraries need to be installed to the system directory, you need to remount system to get read and write permissions to the root directory by following command:
 
 .. code-block:: bash
 
    $ mount -o remount,rw /
 
-runtime库部署
--------------
+Runtime lib installation
+-----------------------------
 
-首先确认目前开发的板子上是否包含该库文件，一般搜索路径如下：
+First confirm whether current deploy environment contains the runtime library files. Generally runtime library resides in:
 
 - ``/usr/lib``
 - ``/usr/local/lib``
 - ``/usr/sdrv/tvm``
 
 
-已部署过runtime库情况
-^^^^^^^^^^^^^^^^^^^^^
+Runtime lib already installed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-如果板子上已有runtime库，且升级了sdnn_build工具，则需要更新板上的runtime库版本，该版本要与sdnn_build工具版本一致。此时只需要下载对应系统的libtvm_runtime.so库文件，覆盖已有的库文件即可。
+If runtime library is already installed, but its version does not match with your upgraded sdnn_build tool, then you need to upgrade your runtime library to the matching new version. So you need to download the new libtvm_runtime.so and overwrite the old libtvm_runtime.so.
 
-未部署过runtime库情况
-^^^^^^^^^^^^^^^^^^^^^
+Runtime lib not installed
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-自动部署包
-""""""""""
-
-下载 **tvm_runtime_linux-deploy.run** 包，放到板子上任意路径，执行下述命令，可实现库的部署：
+Auto installation
+""""""""""""""""""""""""""
+Download **tvm_runtime_linux-deploy.run** to your pc, and upload it to any directory in the board linux system, run command:
 
 .. code-block:: bash
 
    $ sh ./tvm_runtime_linux-deploy.run
 
-上述操作后，**libtvm_runtime.so** 库文件将部署到 ``/usr/sdrv/tvm`` 目录。
+then **libtvm_runtime.so** file would be installed to ``/usr/sdrv/tvm``
 
 
-手动部署库
-""""""""""
+Manual installation
+"""""""""""""""""""""""
 
-下载libtvm-runtime.so库文件，然后手动将其放置到目标路径。为了保证程序运行时能够搜索到该运行库，需要手动配置库文件的加载路径。
+Download libtvm-runtime.so file, then upload it to the directory you defined, finally add this directory to system dynamic library searching configuration file as follow:
 
-1. **ldconfig配置**
+1. **check ldconfig file**
 
-确认 ``/etc`` 目录下存在 ``ld.so.conf`` 文件，如果不存在则创建该文件，并在文件内写入下述内容：
+Check whether ``ld.so.conf`` file exists in directory ``/etc``, if file does not exist, please create and add following to it:
 
 .. code-block:: bash
 
    include /etc/ld.so.conf.d/*.conf
 
-确认是否存在 ``/etc/ld.so.conf.d`` 目录，如果不存在则创建，然后在该目录下创建xxx.conf文件，在该文件中写入库文件的绝对路径。
-最后运行如下命令刷新加载路径：
+Check whether directory ``/etc/ld.so.conf.d`` exists, create it if the directory dose not exist. Create xxx.conf in this directory, and add runtime absolute path to this configure file.
+finally update system dynamic library searching configuration by following command:
 
 .. code-block:: bash
 
    $ ldconfig
 
-2. **环境变量配置**
+OpenCV libraries installation
+------------------------------
 
-通过环境变量 **LD_LIBRARY_PATH** 指定库的路径，其命令如下：
-
-.. code-block:: bash
-
-   $ export LD_LIBRARY_PATH=path/to/your_lib_path
-
-opencv部署
-----------
-
-目前提供的测试程序依赖于opencv库，如果板子上未部署opencv库，可以从 ``examples/vendor/OpenCV`` 目录下拷贝部署包到目标板，执行如下命令实现库的部署：
+Test case code depends on OpenCV. So if OpenCV libraries are not installed in your deploy linux environment, copy auto installer from directory ``examples/vendor/OpenCV`` of test case code to your deploy environment, and run following command:
 
 .. code-block:: bash
 
    $ sh ./opencv_deploy_linux.run
 
-上述操作后，**opencv** 库将会部署到 ``/usr/sdrv/opencv`` 目录。
+**OpenCV** libraries will be installed in directory ``/usr/sdrv/opencv``.
 
-Android环境
-===========
+Deploy on Android board
+========================
 
-adb环境配置
------------
+Adb environment setup
+----------------------
 
-确认USB先插入adb接口，则通过abd工具执行如下操作：
-
-root操作
-^^^^^^^^
+Root device
+^^^^^^^^^^^^^
 
 .. code-block:: bash
 
    $ adb root
 
-mount操作
+Remount
 ^^^^^^^^^
 
 .. code-block:: bash
 
    $ adb remount
 
-进入shell
-^^^^^^^^^
+Open shell
+^^^^^^^^^^^^
 
 .. code-block:: bash
 
    $ adb shell
 
-环境变量配置
-------------
+Environment variables setup
+--------------------------------
 
-从 ``examples/vendor/Android`` 目录拷贝 **android_envsetup.sh** 脚本到板子上任意路径，执行下述命令，完成环境变量初始化。
+Copy **android_envsetup.sh** from directory ``examples/vendor/Android`` of test case code to your deploy environment, run following command:
 
 .. code-block:: bash
 
    $ source android_envsetup.sh
 
-C++库部署
----------
+C++ libraries installation
+---------------------------
 
-查看 ``vendor/lib64`` 目录下是否存在 **libc++_shared.so** 文件，如果不存在，则从 ``examples/vendor/Android`` 目录拷贝 **libc++_shared_android.run** 部署文件，执行下述命令：
+Check whether **libc++_shared.so**  exists in directory ``/vendor/lib64``, if not, copy **libc++_shared_android.run** from directory ``examples/vendor/Android`` of test case code to your deploy environment, run following command:
 
 .. code-block:: bash
 
    $ sh libc++_shared_android.run
 
-runtime库部署
--------------
+Runtime lib installation
+--------------------------
 
-首先确认目前开发的板子上是否包含该库文件，一般搜索路径如下：
+First confirm whether current deploy environment contains the runtime library files. Generally runtime library resides in:
 
 - ``/vendor/lib``
 - ``/vendor/lib64``
 - ``/vendor/sdrv/tvm``
 
-已部署过runtime库情况
-^^^^^^^^^^^^^^^^^^^^^
+Runtime lib already installed
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-如果板子上已有runtime库，且升级了sdnn_build工具，则需要更新板上的runtime库版本，该版本要与sdnn_build工具版本一致。此时只需要下载对应系统的libtvm_runtime.so库文件，覆盖已有的库文件即可。
+If runtime library is already installed, but its version does not match with your upgraded sdnn_build tool, then you need to upgrade your runtime library to the matching new version. So you need to download the new libtvm_runtime.so and overwrite the old libtvm_runtime.so.
 
-未部署过runtime库情况
-^^^^^^^^^^^^^^^^^^^^^
+Runtime lib not installed
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-自动部署包
-""""""""""
+Auto installation
+"""""""""""""""""""""
 
-下载tvm_runtime_android-deploy.run包，放到板子上任意路径，执行下述命令，可实现库的部署：
+Download **tvm_runtime_android-deploy.run** to your pc, and upload it to any directory in the board Android system, run command:
 
 .. code-block:: bash
 
    $ sh ./tvm_runtime_linux-deploy.run
 
-上述操作后，**libtvm_runtime.so** 库文件将部署到 ``/vendor/sdrv/tvm`` 目录。
+then **libtvm_runtime.so** file would be installed to ``/vendor/sdrv/tvm``.
 
-手动部署库
-""""""""""
+Manual installation
+"""""""""""""""""""""""
 
-下载libtvm-runtime.so库文件，然后手动将其放置到 ``/vendor/lib64/`` 目录。如果想指定到其它路径，可以通过环境变量 **LD_LIBRARY_PATH** 指定库的路径，其命令如下：
+Download libtvm-runtime.so file, then upload it to the directory ``/vendor/lib64/`` in your board Android system. If you want to install it to other directory, please configure environment variables **LD_LIBRARY_PATH** as:
 
 .. code-block:: bash
 
    $ export LD_LIBRARY_PATH=path/to/your_lib_path
 
-opencv部署
--------------
+OpenCV libraries installation
+------------------------------
 
-目前提供的测试程序依赖于opencv库，如果板子上未部署opencv库，可以从 ``examples/vendor/OpenCV`` 目录下拷贝部署包到目标板，执行如下命令实现库的部署：
+Test case code depends on OpenCV. So if OpenCV libraries are not installed in your deploy Android environment, copy auto installer from directory ``examples/vendor/OpenCV`` of test case code to your deploy environment, and run following command:
 
 .. code-block:: bash
 
    $ sh ./opencv_deploy_android.run
 
-上述操作后，opencv库将会部署到 ``/vendor/sdrv/opencv`` 目录。
+**OpenCV** libraries will be installed in directory ``/vendor/sdrv/opencv``.
 
-QNX环境
-=======
 
-runtime库部署
--------------
 
-拷贝 **libtvm_runtime.so** 库到 ``/proc/boot/`` 目录完成运行库的更新。
 
-其它环境
-========
 
-如果板子上运行的环境不满足上述系统环境，或者所使用的工具链与预编译的库不一致，为了避免兼容性问题，需要获取sdnn源码，编译新的进runtime库。否则直接从客户支持系统下载已经编译好的runtime库，可跳过该章节内容阅读。
+Deploy on QNX board
+=====================
 
-系统环境
---------
+Runtime lib installation
+--------------------------
 
-目前支持linux、android和qnx系统，如果板子上运行的系统不满足上述三种，则需要源码编译运行库。
+Just download and copy **libtvm_runtime.so** to directory ``/proc/boot/`` in your QNX system.
 
-工具链
-------
-
-- **Linux**
-
-目前linux系统使用的交叉编译工具链是aarch64-gcc7.5 ，如果使用的是其它版本的gcc，可以考虑源码编译；
-
-- **Android**
-
-目前android系统使用的aarch64-linux-android29工具链编译，如果实际使用的NDK不一致，可以考虑源码编译。
-
-- **QNX**
-
-目前qnx是的编译工具是qcc8.3版本，如果使用的不一致，可以考虑源码编译。
-
-获取SDNN源码
-------------
-
-登录客户支持系统下载sdnn源码压缩包，解压后便可得到编译所需的源码文件。
-
-编译SDNN运行库
---------------
-
-进入TVM代码根目录(如图中示例为/workspace/tvm)，依以下步骤逐步操作：
-
-环境变量配置
-^^^^^^^^^^^^
-
-执行下述命令设置环境变量：
-
-.. code-block:: bash
-
-   $ source envsetup.sh
-
-运行库编译
-^^^^^^^^^^
-
-根据部署平台的系统类型，指定目标平台部署包的编译选项：
-
-1. **linux** 系统编译命令
-
-.. code-block:: bash
-
-   $ ./build.sh linux-deploy
-
-编译完后生成 ``build_aarch64-linux`` 目录，部署包 **tvm_runtime_linux-deploy.run** 存在于此目录，也可以直接拷贝 **libtvm_runtime.so** 文件到板子上可加载的目录。
-
-2. **android** 系统编译命令
-
-.. code-block:: bash
-
-   $ ./build.sh android-deploy
-
-编译完成后部署包 **tvm_runtime_android-deploy.run** 生成在 ``build_aarch64-android`` 目录。后续把 **tvm_runtime_xxx-deploy.run** 文件拷贝到目标平台系统下任意文件夹。在文件所在目录执行以下指令：
-
-.. code-block:: bash
-
-   $ chmod 775 tvm_runtime_xxx-deploy.run
-   $ ./tvm_runtime_xxx-deploy.run
-
-其中 ``xxx`` 表示不同平台，执行完以上命令后，linux下则生成 ``/usr/sdrv/tvm`` 目录，android下则生成 ``/vendor/sdrv/tvm`` 目录 **libtvm-runtime.so** 被拷贝安装到此目录下，至此tvm target端部署完毕。
-
-3. **qnx** 系统编译命令
-
-.. code-block:: bash
-
-   $ ./build.sh qnx-deploy
-
-编译完成后在 ``build_aarch64-qnx`` 目录生成 **libtvm_tuntime.so** 文件。后续需要把该文件放到sd卡/u盘或者打包到ifs中 ``/proc/boot`` 目录。如果使用sd卡或者u盘挂载方式部，需要添加 **libtvm_runtime.so** 路径到 **LD_LIBRARY_PATH** 环境变量。
-
-.. code-block:: bash
-
-   $ export LD_LIBRARY_PATH=/path/to/sdcard-mount-point:$LD_LIBRARY_PATH
 
